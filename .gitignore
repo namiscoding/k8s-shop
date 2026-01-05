@@ -1,0 +1,10 @@
+# .gitignore
+*.log
+.DS_Store
+.idea/
+.vscode/
+
+# Ignore secret files
+*secret.yaml
+*secrets.yaml
+creds.txt
