@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: backend-cfg
+  namespace: shop
+data:
+  # Địa chỉ DNS đầy đủ của Pod Database (Service Headless)
+  # Cấu trúc: <pod-name>.<service-name>.<namespace>.svc.cluster.local
+  DB_HOST: "mysql-0.mysql-svc.shop.svc.cluster.local"

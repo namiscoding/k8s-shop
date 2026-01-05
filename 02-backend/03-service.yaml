@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend-svc
+  namespace: shop
+spec:
+  type: ClusterIP
+  selector:
+    app: backend  # Phải khớp với label của Deployment ở trên
+  ports:
+  - port: 80        # Port của Service
+    targetPort: 80  # Port của Container
