@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mysql           # Pod sinh ra sẽ tên là: mysql-0, mysql-1...
+  namespace: shop
+spec:
+  selector:
+    matchLabels:
+      app: mysql        # Phải khớp với Service ở trên
+  serviceName: mysql-svc # <--- BẮT BUỘC: Phải trỏ đúng tên Headless Service
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: mysql      # Label này giúp Service tìm ra Pod
+    spec:
+      containers:
+      - name: mysql
+        image: mysql:5.7
+        ports:
+        - containerPort: 3306
+          name: mysql
+        
+        # 1. Inject toàn bộ biến môi trường từ Secret (Gọn gàng hơn liệt kê từng cái)
+        envFrom:
+        - secretRef:
+            name: db-secret
+            
+        # 2. Quản lý tài nguyên (Tránh MySQL ăn hết RAM của máy bạn)
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "100m"
+          limits:
+            memory: "512Mi" # MySQL 5.7 cần tối thiểu tầm này để chạy ổn
+            cpu: "500m"
+            
+        # 3. Mount ổ cứng vào đường dẫn quy định của MySQL
+        volumeMounts:
+        - name: mysql-data
+          mountPath: /var/lib/mysql
+          
+  # 4. Dynamic Provisioning: Tự động xin cấp phát ổ cứng
+  volumeClaimTemplates:
+  - metadata:
+      name: mysql-data
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      # storageClassName: standard (Trên Minikube nó tự lấy class mặc định, ko cần khai báo)
+      resources:
+        requests:
+          storage: 1Gi
