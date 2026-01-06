@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+  namespace: shop
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: frontend
+  template:
+    metadata:
+      labels:
+        app: frontend
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:alpine
+        ports:
+        - containerPort: 80
+        
+        # [KEY CONCEPT] Mount ConfigMap thành File
+        volumeMounts:
+        - name: html-volume
+          mountPath: /usr/share/nginx/html # Ghi đè thư mục html mặc định của Nginx
+      
+      volumes:
+      - name: html-volume
+        configMap:
+          name: frontend-html
